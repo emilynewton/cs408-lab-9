@@ -6,6 +6,9 @@ const ctx = canvas.getContext("2d");
 const width = (canvas.width = window.innerWidth);
 const height = (canvas.height = window.innerHeight);
 
+// creates a score element from the paragraph in the HTML script
+const score = document.querySelector("p"); 
+
 // function to generate random number
 
 function random(min, max) {
@@ -152,21 +155,30 @@ class EvilCircle extends Shape {
     for (const ball of balls) {
       if (ball.exists == true) {
         ball.exists = false; 
+        score++; 
       }
-
     }
   }
 }
+
+//creating a new instance of evilCircle
+const evilCircle = new EvilCircle(2, 2);
 
 function loop() {
   ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
   ctx.fillRect(0, 0, width, height);
 
   for (const ball of balls) {
-    ball.draw();
-    ball.update();
-    ball.collisionDetect();
+    if (ball.exists) {
+      ball.draw();
+      ball.update();
+      ball.collisionDetect();
+    }
   }
+
+  evilCircle.draw(); 
+  evilCircle.update(); 
+  evilCircle.collisionDetect(); 
 
   requestAnimationFrame(loop);
 }
