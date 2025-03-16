@@ -7,7 +7,8 @@ const width = (canvas.width = window.innerWidth);
 const height = (canvas.height = window.innerHeight);
 
 // creates a score element from the paragraph in the HTML script
-const score = document.querySelector("p"); 
+const scoreText = document.querySelector("p"); 
+let score = 0; 
 
 // function to generate random number
 
@@ -105,7 +106,7 @@ while (balls.length < 25) {
 class EvilCircle extends Shape {
   constructor(x, y) {
     super(x, y, 20, 20); 
-    this.color = white; 
+    this.color = "rgba(255,255,255,1)"; 
     this.size = 10; 
     window.addEventListener("keydown", (e) => {
       switch(e.key) {
@@ -133,36 +134,43 @@ class EvilCircle extends Shape {
     ctx.stroke();    
   }
 
-  update() {
+
+  checkBounds() {
     if (this.x + this.size >= width) {
-      this.x = -Math.abs(this.size);
+      this.velX = -Math.abs(this.velX);
     }
 
     if (this.x - this.size <= 0) {
-      this.x = Math.abs(this.size);
+      this.velX = Math.abs(this.velX);
     }
 
     if (this.y + this.size >= height) {
-      this.y = -Math.abs(this.size);
+      this.velY = -Math.abs(this.velY);
     }
 
     if (this.y - this.size <= 0) {
-      this.y = Math.abs(this.size);
+      this.velY = Math.abs(this.velY);
     }
   }
   
   collisionDetect() {
     for (const ball of balls) {
-      if (ball.exists == true) {
-        ball.exists = false; 
-        score++; 
+      if (ball.exists) {
+        const dx = this.x - ball.x;
+        const dy = this.y - ball.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < this.size + ball.size) {
+          ball.exists = false;
+          scoreText.textContent = "Ball count: " + score++;
+        }
       }
     }
   }
 }
 
 //creating a new instance of evilCircle
-const evilCircle = new EvilCircle(2, 2);
+const evilCircle = new EvilCircle(random(0, width), random(0, height));
 
 function loop() {
   ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
@@ -177,7 +185,7 @@ function loop() {
   }
 
   evilCircle.draw(); 
-  evilCircle.update(); 
+  evilCircle.checkBounds(); 
   evilCircle.collisionDetect(); 
 
   requestAnimationFrame(loop);
